@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 #include <cstring>
 
 
@@ -24,12 +25,8 @@ int main(int argc, char* argv[])
     int opt = 1;//hold socket option value
     int bind_ret = 0;//hold returned value from bind function
     socklen_t addrlen = sizeof(address);//holds size of address struct
-    //hold socket file descriptor for incoming clinet connection
-    int new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
     //...
     char buffer[1024] = {0};//hold client data recieved
-    //hold number of bytes
-    ssize_t valread = read(new_socket, buffer, 1024 - 1);//reserve one character for null terminator
     string message = "Server Message";
 
     //Create socket file descriptor 
@@ -46,7 +43,7 @@ int main(int argc, char* argv[])
     
     //store address info for server node
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr("127.0.0.2");
     address.sin_port = htons(PORT);
 
     //Bind function binds socket to address and port number to addr struct
@@ -64,10 +61,15 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
+    //hold socket file descriptor for incoming clinet connection
+    int new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
+
     if (new_socket < 0){
         perror("Connection Refused");
         exit(0);
     }
+
+    read(new_socket, buffer, 1024 - 1);//hold number of bytes- - reserve one character for null terminator
 
     cout << buffer << endl;
     send(new_socket,message.c_str(),strlen(message.c_str()),0);
