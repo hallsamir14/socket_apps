@@ -16,7 +16,6 @@ int main (int argc, char* argv[]){
     //..
     int valread;
     struct sockaddr_in server_addr;
-    int status = connect(client_fd, (struct sockaddr*)&server_addr,sizeof(server_addr));//hold status value for client
     string message = "Client Message";
     char buffer[1024];
 
@@ -26,7 +25,7 @@ int main (int argc, char* argv[]){
     }
 
     server_addr.sin_family = AF_INET;
-    server_addr.sin_family = htons(PORT);
+    server_addr.sin_port = htons(PORT);
 
     //Convert IP to binary
     //int inet_pton(int af, const char *restrict src, void *restrict dst);
@@ -35,7 +34,9 @@ int main (int argc, char* argv[]){
         cout << "Invalid Address" << endl;
         exit(0);
     }
-
+    
+    int status = connect(client_fd, (struct sockaddr*)&server_addr,sizeof(server_addr));//hold status value for client
+    //cout << (struct sockaddr*)&server_addr;
     if (status < 0){
         cout << "Connection Falied" << endl;
         exit(0);
