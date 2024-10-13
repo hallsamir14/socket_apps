@@ -17,7 +17,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {   
-    //hold socket file descriptor for server - - - socket(domain,type,protocol):
+    //hold socket file descriptor for server node
     int server_fd = socket(AF_INET, SOCK_STREAM, 0); 
     //...
      
