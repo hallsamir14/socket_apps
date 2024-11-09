@@ -1,80 +1,79 @@
-#include <stdio.h>
+#include <iostream>
+#include <cstring>
+#include <string>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <string.h>
-#include <iostream>
 #include <netinet/in.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <cstring>
-
-
-
-using namespace std;
 
 #define PORT 8080
 
-int main(int argc, char* argv[])
-{   
-    //hold socket file descriptor for server node
-    int server_fd = socket(AF_INET, SOCK_STREAM, 0); 
-    //...
-     
-    struct sockaddr_in address;//stores address info for server (port and address)
-    int opt = 1;//hold socket option value
-    int bind_ret = 0;//hold returned value from bind function
-    socklen_t addrlen = sizeof(address);//holds size of address struct
-    //...
-    char buffer[1024] = {0};//hold client data recieved
-    string message = "Server Message";
+void handleError(const std::string& errorMessage) {
+    perror(errorMessage.c_str());
+    exit(EXIT_FAILURE);
+}
 
-    //Create socket file descriptor 
-    if(server_fd<0){
-        perror("Socket Failed");
-        exit(0);
+int initializeServerSocket() {
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
+        handleError("Socket creation failed");
+    }
+    return server_fd;
+}
+
+void setSocketOptions(int server_fd) {
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
+        handleError("Set socket options failed");
+    }
+}
+
+void bindSocket(int server_fd, struct sockaddr_in& address) {
+    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+        handleError("Bind failed");
+    }
+}
+
+void listenForConnections(int server_fd) {
+    if (listen(server_fd, 3) < 0) {
+        handleError("Listen failed");
+    }
+}
+
+void acceptAndHandleClient(int server_fd, struct sockaddr_in& address) {
+    socklen_t addrlen = sizeof(address);
+    int new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
+    if (new_socket < 0) {
+        handleError("Accept failed");
     }
 
-    //Setsocket options
-    if (setsockopt(server_fd,SOL_SOCKET,SO_REUSEADDR|SO_REUSEPORT, &opt, sizeof(opt))){
-        perror("Setsocketopt");
-        exit(0);
-    }
-    
-    //store address info for server node
+    char buffer[1024] = {0};
+    std::string message = "Server Message";
+
+    read(new_socket, buffer, sizeof(buffer) - 1);
+    std::cout << buffer << std::endl;
+
+    send(new_socket, message.c_str(), message.length(), 0);
+    std::cout << "Message sent" << std::endl;
+
+    close(new_socket);
+}
+
+int main() {
+    int server_fd = initializeServerSocket();
+
+    struct sockaddr_in address;
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = inet_addr("127.0.0.2");
     address.sin_port = htons(PORT);
 
-    //Bind function binds socket to address and port number to addr struct
-    //- - - int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
-    bind_ret = bind(server_fd,(struct sockaddr*)&address,sizeof(address));
+    setSocketOptions(server_fd);
+    bindSocket(server_fd, address);
+    listenForConnections(server_fd);
 
-    if(bind_ret < 0){
-        perror("bind failed");
-        exit(0);
-    }
-    //Server node waits for incoming client connection
-    //- - - int listen(int sockfd, int backlog);
-    if(listen(server_fd, 3) < 0){
-        perror("Server listening error");
-        exit(0);
-    }
+    acceptAndHandleClient(server_fd, address);
 
-    //hold socket file descriptor for incoming clinet connection
-    int new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
-
-    if (new_socket < 0){
-        perror("Connection Refused");
-        exit(0);
-    }
-
-    read(new_socket, buffer, 1024 - 1);//hold number of bytes- - reserve one character for null terminator
-
-    cout << buffer << endl;
-    send(new_socket,message.c_str(),strlen(message.c_str()),0);
-    cout << "Message sent" << endl;
-
-
-
+    close(server_fd);
+    return 0;
 }
