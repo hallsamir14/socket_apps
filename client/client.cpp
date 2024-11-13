@@ -1,55 +1,58 @@
 #include <arpa/inet.h>
-#include <stdio.h>
-#include <string.h>
+#include <iostream>
+#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <cstring>
-#include <string>
-#include <iostream>
 
-using namespace std;
 #define PORT 8080
+#define SERVER_IP "127.0.0.2"
+#define BUFFER_SIZE 1024
 
-int main (int argc, char* argv[]){
-    //hold socket file descriptor for client - - - socket(domain,type,protocol):
+void handleError(const std::string& errorMessage) {
+    perror(errorMessage.c_str());
+    exit(EXIT_FAILURE);
+}
+
+int createSocket() {
     int client_fd = socket(AF_INET, SOCK_STREAM, 0);
-    //..
-    int valread;
-    struct sockaddr_in server_addr;
-    string message = "Client Message";
-    char buffer[1024];
-
-    if (client_fd <= 0){
-        perror("Socket Creation error");
-        exit(0);
+    if (client_fd < 0) {
+        handleError("Socket creation error");
     }
+    return client_fd;
+}
 
+void connectToServer(int client_fd, const struct sockaddr_in& server_addr) {
+    if (connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        handleError("Connection failed");
+    }
+}
+
+void sendMessage(int client_fd) {
+    std::string message = "Client Message";
+    char buffer[BUFFER_SIZE] = {0};
+
+    send(client_fd, message.c_str(), message.length(), 0);
+    int valread = read(client_fd, buffer, BUFFER_SIZE);
+    if (valread < 0) {
+        handleError("Read error");
+    }
+    std::cout << "Server: " << buffer << std::endl;
+}
+
+int main(int argc, char* argv[]) {
+    int client_fd = createSocket();
+
+    struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
 
-    //Convert IP to binary
-    //int inet_pton(int af, const char *restrict src, void *restrict dst);
-    int conv_IP = inet_pton(AF_INET,"127.0.0.2", &server_addr.sin_addr);
-    if (conv_IP <= 0){
-        cout << "Invalid Address" << endl;
-        exit(0);
-    }
-    
-    int status = connect(client_fd, (struct sockaddr*)&server_addr,sizeof(server_addr));//hold status value for client
-    //cout << (struct sockaddr*)&server_addr;
-    if (status < 0){
-        cout << "Connection Falied" << endl;
-        exit(0);
+    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
+        handleError("Invalid address/ Address not supported");
     }
 
-    send(client_fd,message.c_str(),strlen(message.c_str()),0);
-    cout << "Message Sent" << endl;
-    valread = read(client_fd, buffer,1024-1);
-    cout << buffer << endl;
+    connectToServer(client_fd, server_addr);
+    sendMessage(client_fd);
 
-    //close socket
-    close (client_fd);
+    close(client_fd);
     return 0;
-
-
 }
