@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+*.bin
 
 # VS Code Artifcats
 /.vscode
