@@ -21,21 +21,18 @@ void Client_Socket::handleError(const std::string& errorMessage) {
     exit(EXIT_FAILURE);
 }
 
-int Client_Socket::createSocket() {
-    int client_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_fd < 0) {
-        handleError("Socket creation error");
-    }
-    return client_fd;
-}
-
-
 //public methods
 //todo_0 - - - what data should constructor set/define?
 //todo_1 - - - what data should be passed/globally declard within class
 
 Client_Socket::Client_Socket() {
+    client_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_fd < 0) {
+        handleError("Socket creation error");
+    }
+}
 
+void Client_Socket::connectToServer() {
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
@@ -44,16 +41,13 @@ Client_Socket::Client_Socket() {
         handleError("Invalid address/ Address not supported");
     }
 
-
-}
-
-void Client_Socket::connectToServer(int client_fd, const struct sockaddr_in& server_addr) {
     if (connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         handleError("Connection failed");
     }
+
 }
 
-void Client_Socket::sendMessage(int client_fd){
+void Client_Socket::sendMessage(){
     std::string message = "Client Message";
     char buffer[BUFFER_SIZE] = {0};
 

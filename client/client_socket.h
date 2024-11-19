@@ -8,12 +8,13 @@
 
 class Client_Socket {
     private:
+        int client_fd;
         void handleError(const std::string& errorMessage);
         int createSocket();
     public:
         Client_Socket();
-        void connectToServer(int client_fd, const struct sockaddr_in& server_addr);
-        void sendMessage(int client_fd);
+        void connectToServer();
+        void sendMessage();
 };
 
 #endif // CLIENT_SOCKET_H
