@@ -1,3 +1,5 @@
+#include "server_socket.h"
+
 #include <iostream>
 #include <cstring>
 #include <string>
@@ -8,40 +10,36 @@
 #include <arpa/inet.h>
 
 #define PORT 8080
+#define SERVER_IP "127.0.0.2"
+#define BUFFER_SIZE 1024
 
-void handleError(const std::string& errorMessage) {
+void Server_Socket::handleError(const std::string& errorMessage) {
     perror(errorMessage.c_str());
     exit(EXIT_FAILURE);
 }
 
-int initializeServerSocket() {
-    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd < 0) {
-        handleError("Socket creation failed");
+void Server_Socket::bindSocket(struct sockaddr_in& address) {
+    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+        handleError("Bind failed");
     }
-    return server_fd;
 }
 
-void setSocketOptions(int server_fd) {
+void Server_Socket::setSocketOptions() {
     int opt = 1;
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
         handleError("Set socket options failed");
     }
 }
 
-void bindSocket(int server_fd, struct sockaddr_in& address) {
-    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
-        handleError("Bind failed");
-    }
-}
 
-void listenForConnections(int server_fd) {
+
+void Server_Socket::listenForConnections() {
     if (listen(server_fd, 3) < 0) {
         handleError("Listen failed");
     }
 }
 
-void acceptAndHandleClient(int server_fd, struct sockaddr_in& address) {
+void Server_Socket::acceptAndHandleClient(struct sockaddr_in& address) {
     socklen_t addrlen = sizeof(address);
     int new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
     if (new_socket < 0) {
@@ -57,9 +55,41 @@ void acceptAndHandleClient(int server_fd, struct sockaddr_in& address) {
     send(new_socket, message.c_str(), message.length(), 0);
     std::cout << "Message sent" << std::endl;
 
+    //define more roubust implementation to close server file descriptor in a seperate method
     close(new_socket);
 }
 
+Server_Socket::Server_Socket() {
+
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
+        handleError("Socket creation failed");
+    }
+}
+
+int Server_Socket::start(){
+    struct sockaddr_in address;
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = inet_addr(SERVER_IP);
+    address.sin_port = htons(PORT);
+
+    setSocketOptions();
+    bindSocket(address);
+    listenForConnections();
+
+    acceptAndHandleClient(address);
+
+    return 0;
+
+    
+}
+
+
+
+
+
+
+/*
 int main() {
     int server_fd = initializeServerSocket();
 
@@ -77,3 +107,5 @@ int main() {
     close(server_fd);
     return 0;
 }
+
+*/
