@@ -9,11 +9,11 @@ SERVER_DIR = server
 
 # Source files
 CLIENT_SRC = $(CLIENT_DIR)/client_main.cpp
-SERVER_SRC = $(SERVER_DIR)/server_socket.cpp
+SERVER_SRC = $(SERVER_DIR)/server_main.cpp
 
 # Output binaries
-CLIENT_BIN = client.bin
-SERVER_BIN = server.bin
+CLIENT_BIN = client/client.bin
+SERVER_BIN = server/server.bin
 
 # Build all
 all: $(CLIENT_BIN) $(SERVER_BIN)
