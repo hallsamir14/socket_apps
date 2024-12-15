@@ -1,20 +1,19 @@
 #include "server_socket.cpp"
-#include <iostream>
-#include <cstring>
-#include <string>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
 #include <arpa/inet.h>
+#include <cstring>
+#include <iostream>
+#include <netinet/in.h>
+#include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-int main(){
+int main() {
 
-    Server_Socket server = Server_Socket();
+  Server_Socket server = Server_Socket();
 
-    server.start();
+  server.start();
+  server.stop();
 
-    return 0;
-
-
+  return 0;
 }

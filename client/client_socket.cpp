@@ -15,46 +15,45 @@
 Client node class that defines an instance of a client-side socket.
 */
 
-//private methods
-void Client_Socket::handleError(const std::string& errorMessage) {
-    perror(errorMessage.c_str());
-    exit(EXIT_FAILURE);
+// private methods
+void Client_Socket::handleError(const std::string &errorMessage) {
+  perror(errorMessage.c_str());
+  exit(EXIT_FAILURE);
 }
-
-//public methods
-//todo_0 - - - what data should constructor set/define?
-//todo_1 - - - what data should be passed/globally declard within class
 
 Client_Socket::Client_Socket() {
-    client_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (client_fd < 0) {
-        handleError("Socket creation error");
-    }
+  client_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (client_fd < 0) {
+    handleError("Socket creation error");
+  }
 }
 
+// TODO:define param to allow server IP and Port to be passed as argument to
+// connectToServer()
 void Client_Socket::connectToServer() {
-    struct sockaddr_in server_addr;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(PORT);
+  struct sockaddr_in server_addr;
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_port = htons(PORT);
 
-    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
-        handleError("Invalid address/ Address not supported");
-    }
+  if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
+    handleError("Invalid address/ Address not supported");
+  }
 
-    if (connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        handleError("Connection failed");
-    }
-
+  if (connect(client_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) <
+      0) {
+    handleError("Connection failed");
+  }
 }
 
-void Client_Socket::sendMessage(){
-    std::string message = "Client Message";
-    char buffer[BUFFER_SIZE] = {0};
+// TODO:define param to allow message to be passed as argument to sendMessage()
+void Client_Socket::sendMessage() {
+  std::string message = "Client Message";
+  char buffer[BUFFER_SIZE] = {0};
 
-    send(client_fd, message.c_str(), message.length(), 0);
-    int valread = read(client_fd, buffer, BUFFER_SIZE);
-    if (valread < 0) {
-        handleError("Read error");
-    }
-    std::cout << "Server: " << buffer << std::endl;
+  send(client_fd, message.c_str(), message.length(), 0);
+  int valread = read(client_fd, buffer, BUFFER_SIZE);
+  if (valread < 0) {
+    handleError("Read error");
+  }
+  std::cout << "Server: " << buffer << std::endl;
 }
