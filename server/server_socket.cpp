@@ -15,7 +15,7 @@
 
 // private methods..............
 void Server_Socket::handleError(const std::string &errorMessage) {
-  LOG(INFO) << errorMessage;
+  LOG(ERROR) << errorMessage;
   exit(EXIT_FAILURE);
 }
 
