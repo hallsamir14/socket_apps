@@ -1,7 +1,7 @@
 // server_socket.h
 
 #ifndef SERVER_SOCKET_H
-#define CLIENT_SOCKET_H
+#define SERVER_SOCKET_H
 
 #include <string>
 
