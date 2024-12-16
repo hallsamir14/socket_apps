@@ -1,6 +1,6 @@
-# BasicSocket
+# Socket Applications
 
-BasicSocket is a foundational client-server application implemented in C++ using socket programming. The `socket_base` branch serves as a base branch for more complex socket-based projects. It provides reusable and expandable server and client classes that can be used as building blocks for advanced networking applications.
+Socket Applications is a foundational client-server application implemented in C++ using socket programming. The `socket_base` branch serves as a base branch for more complex socket-based projects. It provides reusable and expandable server and client classes that can be used as building blocks for advanced networking applications.
 
 ![Alt text](image.png)
 
