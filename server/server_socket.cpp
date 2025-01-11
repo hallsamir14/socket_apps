@@ -4,9 +4,11 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <netinet/in.h>
+#include <stdexcept>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <map>
 #include <unistd.h>
 
 #define PORT 8080
@@ -21,7 +23,7 @@ void Server_Socket::handleError(const std::string &errorMessage) {
 
 void Server_Socket::bindSocket(struct sockaddr_in &address) {
   if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-    handleError("Bind failed");
+    throw std::runtime_error("Bind failed");
   }
 }
 
@@ -29,13 +31,13 @@ void Server_Socket::setSocketOptions() {
   int opt = 1;
   if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt,
                  sizeof(opt)) < 0) {
-    handleError("Set socket options failed");
+    throw std::runtime_error("Set socket options failed");
   }
 }
 
 void Server_Socket::listenForConnections() {
   if (listen(server_fd, 3) < 0) {
-    handleError("Listen failed");
+    throw std::runtime_error("Listen failed");
   }
 }
 
@@ -43,7 +45,7 @@ void Server_Socket::acceptAndHandleClient(struct sockaddr_in &address) {
   socklen_t addrlen = sizeof(address);
   new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
   if (new_socket < 0) {
-    handleError("Accept failed");
+    throw std::runtime_error("Accept failed");
   }
 
   char buffer[1024] = {0};
@@ -73,9 +75,15 @@ bool Server_Socket::start() {
     address.sin_addr.s_addr = inet_addr(SERVER_IP);
     address.sin_port = htons(PORT);
 
+    LOG(INFO) << "Address Type:" << address.sin_family << std::endl;
+    LOG(INFO) << "Host IP:" << SERVER_IP << std::endl;
+    LOG(INFO) << "Host PORT:" << PORT << std::endl;
+
     setSocketOptions();
     bindSocket(address);
     listenForConnections();
+
+    LOG(INFO) << "Server Listening..." << std::endl ;
 
     acceptAndHandleClient(address);
     return 1;
