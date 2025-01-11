@@ -62,3 +62,18 @@ Cleanup Binaries:
 ```
 make clean
 ```
+
+## Developer Guide
+Supported address families. - - -
+- AF_UNSPEC	    0   /* Unspecified*/
+- AF_UNIX	    1	/* Unix domain sockets 		*/
+- AF_INET		2	/* Internet IP Protocol 	*/
+- AF_AX25		3	/* Amateur Radio AX.25 		*/
+- AF_IPX		4	/* Novell IPX 			*/
+- AF_APPLETALK	5	/* Appletalk DDP 		*/
+- AF_NETROM	6	/* Amateur radio NetROM 	*/
+- AF_BRIDGE	7	/* Multiprotocol bridge 	*/
+- AF_AAL5		8	/* Reserved for Werner's ATM 	*/
+- AF_X25		9	/* Reserved for X.25 project 	*/
+- AF_INET6	10	/* IP version 6			*/
+- AF_MAX		12	/* For now.. */
