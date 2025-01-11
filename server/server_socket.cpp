@@ -63,7 +63,7 @@ Server_Socket::Server_Socket() {
 
   server_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (server_fd < 0) {
-    handleError("Socket creation failed");
+    throw std::runtime_error("Socket creation failed");
   }
 }
 
@@ -83,7 +83,7 @@ bool Server_Socket::start() {
     bindSocket(address);
     listenForConnections();
 
-    LOG(INFO) << "Server Listening..." << std::endl ;
+    LOG(INFO) << "Server Listening..." << std::endl;
 
     acceptAndHandleClient(address);
     return 1;
@@ -98,6 +98,7 @@ bool Server_Socket::start() {
 bool Server_Socket::stop() {
   try {
     close(new_socket);
+    LOG(INFO) << "Closing Server Socket" << std::endl;
     return 1;
   } catch (const std::exception &e) {
     return 0;

@@ -9,6 +9,7 @@
 #include <glog/logging.h>
 #include "server_socket.h"
 int main() {
+  //Configure and initialize logger
   FLAGS_logtostderr = 1;  // Log all messages to stderr
   google::InitGoogleLogging("server_main");
   
