@@ -7,9 +7,10 @@
 
 class Server_Socket {
 private:
+  // declare server socket descriptor and socket data members
   int server_fd;
-  int new_socket;
-  void handleError(const std::string &errorMessage);
+  int server_socket;
+  bool status;
   void bindSocket(struct sockaddr_in &address);
   void setSocketOptions();
   void listenForConnections();
@@ -17,9 +18,11 @@ private:
 
 public:
   Server_Socket();
-  // methods to start and stop server will return status code
+  // start and stop methods will return status code
   bool start();
   bool stop();
+  // status method to return status on socket instance
+  bool get_status();
 };
 
 #endif // SERVER_SOCKET_H

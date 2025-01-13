@@ -3,12 +3,12 @@
 #include <cstring>
 #include <glog/logging.h>
 #include <iostream>
+#include <map>
 #include <netinet/in.h>
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <map>
 #include <unistd.h>
 
 #define PORT 8080
@@ -16,11 +16,6 @@
 #define BUFFER_SIZE 1024
 
 // private methods..............
-void Server_Socket::handleError(const std::string &errorMessage) {
-  LOG(ERROR) << errorMessage;
-  exit(EXIT_FAILURE);
-}
-
 void Server_Socket::bindSocket(struct sockaddr_in &address) {
   if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
     throw std::runtime_error("Bind failed");
@@ -43,25 +38,27 @@ void Server_Socket::listenForConnections() {
 
 void Server_Socket::acceptAndHandleClient(struct sockaddr_in &address) {
   socklen_t addrlen = sizeof(address);
-  new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
-  if (new_socket < 0) {
+  server_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
+  if (server_socket < 0) {
     throw std::runtime_error("Accept failed");
   }
 
   char buffer[1024] = {0};
   std::string message = "Server Message";
 
-  read(new_socket, buffer, sizeof(buffer) - 1);
-  std::cout << buffer << std::endl;
+  read(server_socket, buffer, sizeof(buffer) - 1);
+  LOG(INFO) << "[Inbound Message]:" << buffer << std::endl;
 
-  send(new_socket, message.c_str(), message.length(), 0);
-  std::cout << "Message sent" << std::endl;
+  send(server_socket, message.c_str(), message.length(), 0);
+  LOG(INFO) << "[Outbound Message]:"
+            << "Message:" << message << std::endl;
 }
 
 // public methods.......................
 Server_Socket::Server_Socket() {
 
   server_fd = socket(AF_INET, SOCK_STREAM, 0);
+  status = 0;
   if (server_fd < 0) {
     throw std::runtime_error("Socket creation failed");
   }
@@ -69,7 +66,8 @@ Server_Socket::Server_Socket() {
 
 bool Server_Socket::start() {
 
-  try {
+  if (status == 0) {
+    LOG(INFO) << "Starting Server Socket" << std::endl;
     struct sockaddr_in address;
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = inet_addr(SERVER_IP);
@@ -85,22 +83,35 @@ bool Server_Socket::start() {
 
     LOG(INFO) << "Server Listening..." << std::endl;
 
+    status = 1;
+
     acceptAndHandleClient(address);
+
     return 1;
   }
 
-  catch (const std::exception &e) {
-    handleError(e.what());
+  else if (status == 1) {
+    LOG(INFO) << "Server Socket Is Already Active" << std::endl;
     return 0;
   }
+
+  return 0;
 }
 
 bool Server_Socket::stop() {
-  try {
-    close(new_socket);
+  if (status == 1) {
+    close(server_socket);
     LOG(INFO) << "Closing Server Socket" << std::endl;
     return 1;
-  } catch (const std::exception &e) {
+  }
+
+  else if (status == 0) {
+    LOG(INFO) << "Socket Is Not Active" << std::endl;
     return 0;
   }
+
+  return 0;
 }
+
+// TODO Finish implementing get_status()
+bool Server_Socket::get_status() { return status; }
