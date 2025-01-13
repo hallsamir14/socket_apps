@@ -92,7 +92,6 @@ bool Server_Socket::start() {
 
   else if (status == 1) {
     LOG(INFO) << "Server Socket Is Already Active" << std::endl;
-    return 0;
   }
 
   return 0;
@@ -107,11 +106,9 @@ bool Server_Socket::stop() {
 
   else if (status == 0) {
     LOG(INFO) << "Socket Is Not Active" << std::endl;
-    return 0;
   }
 
   return 0;
 }
 
-// TODO Finish implementing get_status()
 bool Server_Socket::get_status() { return status; }
