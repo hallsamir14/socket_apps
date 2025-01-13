@@ -65,8 +65,6 @@ make clean
 
 ## Developer Guide
 
-## Developer Guide
-
 **Supported Address Families/Types**
 
 | Address Family Arg Value | Description                    |
