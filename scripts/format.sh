@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#for format consistency across all designated src files
+
 # using 'apt-get install clang-format' to install on debian
 if [ $# -eq 0 ]; then
     echo "Formatting all source files"

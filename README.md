@@ -25,7 +25,7 @@ The project is organized into the following directories and files:
     |    ├── server_socket.cpp │ 
     |    └── server_socket.h 
     ├── .gitignore 
-    ├── Makefile 
+    ├── CMakeLists.txt
     └── README.md
 
 
@@ -43,25 +43,32 @@ The project is organized into the following directories and files:
 
 ## Build Source
 
-To build the client and server modules, use the provided `Makefile`:
+**Create Build Directory**
+```
+mkdir build
+cd build
+```
+
+**Generate Build Files with CMake**
+```
+cmake ..
+```
+
+**Run Setup Script**
+```
+cmake --build . --target setup
+```
+
+**Build Project**
 ```
 make
 ```
 
-Start Server:
+**Clean Build Artifacts**
 ```
-./server/server.bin
-```
-
-Start Client:
-```
-./client/client.bin
+make custom_clean
 ```
 
-Cleanup Binaries:
-```
-make clean
-```
 
 ## Developer Guide
 

@@ -37,5 +37,8 @@
 # VS Code Artifcats
 /.vscode
 
-#
+# logs
 /logs
+
+#Build Artifacts
+/build
