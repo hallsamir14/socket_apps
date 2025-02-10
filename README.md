@@ -1,6 +1,6 @@
 # Socket Applications
 
-Socket Applications is a foundational client-server application implemented in C++ using socket programming. The `socket_base` branch serves as a base branch for more complex socket-based projects. It provides reusable and expandable server and client classes that can be used as building blocks for advanced networking applications.
+TCP Sockets are a foundational client-server modeled implemenation of TCP using socket programming. Various versions of this project can serve as a base for more complex TCP socket-based implementations.
 
 ![Alt text](image.png)
 
