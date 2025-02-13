@@ -8,8 +8,8 @@
 
 class Client_Socket {
 private:
+  bool status;
   int client_fd;
-  void handleError(const std::string &errorMessage);
   int createSocket();
 
 public:
